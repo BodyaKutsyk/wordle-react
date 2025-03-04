@@ -1,0 +1,66 @@
+@import './../../utils/resources';
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 98vw;
+
+  @include onTablet {
+    gap: 8px;
+  }
+}
+
+.keyboardLine {
+  display: flex;
+  gap: 5px;
+  
+  @include onTablet {
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.key {
+  flex: 1;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  font-size: 18px;
+  text-transform: capitalize;
+  line-height: 1em;
+  transition: $transition-duration ease-in;
+  background-color: #808080;
+  border-radius: 2px;
+
+  @include onTablet {
+    flex: 0;
+    padding: 20px;
+    font-size: 24px;
+  }
+
+  & img {
+    color: white;
+    height: 20px;
+    width: 20px;
+    
+    @include onTablet {
+      height: 35px;
+      width: 35px;
+    }
+  }
+
+  &Img {
+    text-transform: none;
+  }
+
+  &:hover {
+    background-color: #36454F;
+  }
+}
