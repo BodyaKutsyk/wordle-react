@@ -9,6 +9,7 @@ type Props = {
   status: CharStatus;
 };
 
+// eslint-disable-next-line react/display-name
 export const Tile: React.FC<Props> = React.memo(({ tile, status }) => {
   return (
     <motion.div

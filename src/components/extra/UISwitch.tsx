@@ -1,9 +1,9 @@
-import { styled, Switch } from "@mui/material";
+import { styled, Switch } from '@mui/material';
 
 export const MaterialUISwitch = styled(Switch)(({ theme }) => ({
-  position: "absolute",
-  top: "10px",
-  right: "10px",
+  position: 'absolute',
+  top: '10px',
+  right: '10px',
   width: 62,
   height: 34,
   padding: 7,
