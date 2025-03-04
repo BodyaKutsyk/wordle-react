@@ -1,0 +1,47 @@
+@import './utils/resources'; 
+
+.board {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+  font-family: Oswald, sans-serif;
+  color: white;
+  background-color: $game-background;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wrapper {
+  height: fit-content;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+
+  @include onTablet {
+    gap: 10px;
+  }
+}
+
+.title {
+  color: $title;
+  font-size: 42px;
+  margin: 0;
+
+  @include onTablet {
+    font-size: 54px;
+  }
+}
+
+.bold {
+  font-size: 18px;
+  font-weight: 600;
+  font-style: italic;
+}

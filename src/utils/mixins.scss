@@ -1,0 +1,11 @@
+@mixin onTablet { /* stylelint-disable-line scss/at-mixin-pattern */
+  @media (min-width: $tablet-min-width) {
+    @content;
+  }
+}
+
+@mixin onDesktop { /* stylelint-disable-line scss/at-mixin-pattern */
+  @media (min-width: $desktop-min-width) {
+    @content;
+  }
+}
