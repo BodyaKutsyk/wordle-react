@@ -6,9 +6,9 @@ import { Stack } from '@mui/material';
 import Confetti from 'react-confetti';
 import { MaterialUISwitch } from './components/extra/UISwitch';
 import { Keyboard } from './components/Keyboard';
-import { fetchEngWords, fetchUaWords } from './utils/fetchWords';
-import { checkIsWord } from './utils/checkIsWord';
 import { Modal } from './components/extra/Modal';
+import { useLanguage } from './providers/language-provider';
+import { useWord } from './providers/word-provider';
 
 const LINES = 6;
 const TILES = 5;
@@ -16,10 +16,12 @@ const tilesArray = Array(TILES).fill('');
 const linesArray = Array(LINES).fill(tilesArray);
 
 export const Board = () => {
+  const { changeLanguage } = useLanguage();
+  const { word, checkWord } = useWord();
+
   const [board, setBoard] = useState(linesArray);
   const [guess, setGuess] = useState('');
   const [attempt, setAttempt] = useState(0);
-  const [correctWord, setCorrectWord] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
   const [open, setOpen] = useState(false);
   const [isReseted, setIsReseted] = useState(true);
@@ -52,9 +54,11 @@ export const Board = () => {
 
       if (key === 'enter' && attempt <= 5) {
         if (guess.length === 5) {
-          const isWordExists = await checkIsWord(guess, isEng);
+          const isWordExists = checkWord(guess);
+          const words = board.slice(0, attempt).map(row => row.join(''));
+          const isInBoard = words.includes(guess);
 
-          if (!isWordExists) {
+          if (!isWordExists || isInBoard) {
             const div = lineRef.current;
 
             div?.classList.add(lineStyle.shake);
@@ -65,7 +69,7 @@ export const Board = () => {
             return;
           }
 
-          if (guess === correctWord) {
+          if (guess === word) {
             setOpen(true);
             setIsGameOver(true);
           }
@@ -74,7 +78,7 @@ export const Board = () => {
           setGuess('');
         }
 
-        if (attempt === 5 && correctWord !== guess) {
+        if (attempt === 5 && word !== guess) {
           setIsGameOver(true);
           setOpen(true);
         }
@@ -88,35 +92,32 @@ export const Board = () => {
 
       if (regex.test(key)) {
         setGuess(prev => prev + key);
+        const newBoard = [...board];
+        const currentGuess = guess + key;
+
+        newBoard[attempt] = currentGuess.padEnd(5, ' ').split('');
+        setBoard(newBoard);
       }
     },
-    [isGameOver, board, attempt, guess, isEng, correctWord],
+    [isGameOver, board, attempt, guess, isEng, word],
   );
+
   const handleReset = () => {
     setBoard(linesArray);
     setIsGameOver(false);
     setOpen(false);
     setAttempt(0);
     setGuess('');
-    setCorrectWord('');
     setIsReseted(true);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = isEng ? await fetchEngWords() : await fetchUaWords();
-      const randomWord = data[Math.floor(Math.random() * data.length)];
+  const handleChangeLanguage = () => {
+    setIsEng(prev => {
+      changeLanguage(!prev ? "EN": "UA")
 
-      setCorrectWord(randomWord);
-      setIsReseted(false);
-      // eslint-disable-next-line no-console
-      console.log(randomWord);
-    };
-
-    if (isReseted) {
-      fetchData();
-    }
-  }, [isReseted, isEng]);
+      return !prev;
+    })
+  }
 
   useEffect(() => {
     document.addEventListener('keydown', handleClick);
@@ -124,20 +125,11 @@ export const Board = () => {
     return () => document.removeEventListener('keydown', handleClick);
   }, [handleClick]);
 
-  useEffect(() => {
-    if (!isGameOver) {
-      const newBoard = [...board];
-
-      newBoard[attempt] = guess.padEnd(5, ' ').split('');
-      setBoard(newBoard);
-    }
-  }, [guess, attempt, board, isGameOver]);
-
   useEffect(handleReset, [isEng]);
 
   return (
     <>
-      {correctWord === guess && isGameOver && attempt < 5 && (
+      {word === guess && isGameOver && attempt < 5 && (
         <Confetti
           height={window.innerHeight}
           width={window.innerWidth}
@@ -149,7 +141,7 @@ export const Board = () => {
         open={open}
         board={board}
         setOpen={setOpen}
-        correctWord={correctWord}
+        correctWord={word}
         handleReset={handleReset}
         isEng={isEng}
       />
@@ -160,7 +152,7 @@ export const Board = () => {
           <Stack direction="row" sx={{ alignItems: 'center' }}>
             <MaterialUISwitch
               value={isEng}
-              onChange={() => setIsEng(prev => !prev)}
+              onChange={handleChangeLanguage}
               inputProps={{ 'aria-label': 'ant design' }}
             />
           </Stack>
@@ -172,14 +164,14 @@ export const Board = () => {
               isGameOver={isGameOver}
               ref={lineRef}
               index={i}
-              correctWord={correctWord}
+              correctWord={word}
               attempt={attempt}
               line={line}
               key={i}
             />
           ))}
         </div>
-        <Keyboard isEng={isEng} guess={guess} setGuess={setGuess} />
+        <Keyboard guess={guess} setGuess={setGuess} attemptedWords={board.slice(0, attempt).map(row => row.join(''))} />
       </div>
     </>
   );

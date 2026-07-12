@@ -23,6 +23,7 @@ export const Tile: React.FC<Props> = React.memo(({ tile, status }) => {
         {tile && (
           <motion.div
             key={tile}
+            id={tile}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0, opacity: 0 }}

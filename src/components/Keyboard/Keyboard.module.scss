@@ -64,3 +64,18 @@
     background-color: #36454F;
   }
 }
+
+.missed {
+  background-color: $tile-missed  !important;
+  border: 2px solid $tile-missed;
+}
+
+.correct {
+  background-color: $tile-correct !important;
+  border: 2px solid $tile-correct;
+}
+
+.wrong {
+  background-color: $tile-wrong !important;
+}
+
