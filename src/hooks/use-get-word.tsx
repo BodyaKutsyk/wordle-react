@@ -29,7 +29,7 @@ export const useGetWord = ({ language, refetch }: UseGetWordProps) => {
 
       setWord(randomWord);
       setWords(data);
-    })()
+    })();
   }, [language, refetch]);
 
   return { randomWord: word, words };

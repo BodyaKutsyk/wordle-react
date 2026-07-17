@@ -17,7 +17,7 @@ const linesArray = Array(LINES).fill(tilesArray);
 
 export const Board = () => {
   const { changeLanguage } = useLanguage();
-  const { word, checkWord } = useWord();
+  const { word, checkWord, reset } = useWord();
 
   const [board, setBoard] = useState(linesArray);
   const [guess, setGuess] = useState('');
@@ -109,14 +109,12 @@ export const Board = () => {
     setAttempt(0);
     setGuess('');
     setIsReseted(true);
+    reset();
   };
 
   const handleChangeLanguage = () => {
-    setIsEng(prev => {
-      changeLanguage(!prev ? "EN": "UA")
-
-      return !prev;
-    })
+    setIsEng(prev => !prev)
+    changeLanguage(!isEng ? 'EN' : 'UA');
   }
 
   useEffect(() => {
@@ -171,7 +169,7 @@ export const Board = () => {
             />
           ))}
         </div>
-        <Keyboard guess={guess} setGuess={setGuess} attemptedWords={board.slice(0, attempt).map(row => row.join(''))} />
+        <Keyboard guess={guess} setGuess={setGuess} />
       </div>
     </>
   );

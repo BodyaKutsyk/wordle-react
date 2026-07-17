@@ -1,1 +1,1 @@
-export type CharStatus = 'missed' | 'correct' | 'wrong' | ''
+export type CharStatus = 'missed' | 'correct' | 'wrong' | 'not-used'
