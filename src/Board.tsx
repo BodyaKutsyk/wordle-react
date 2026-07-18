@@ -2,13 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import boardStyles from './Board.module.scss';
 import { Line } from './components/Line';
 import lineStyle from './components/Line/Line.module.scss';
-import { Stack } from '@mui/material';
 import Confetti from 'react-confetti';
-import { MaterialUISwitch } from './components/extra/UISwitch';
 import { Keyboard } from './components/Keyboard';
-import { Modal } from './components/extra/Modal';
 import { useLanguage } from './providers/language-provider';
 import { useWord } from './providers/word-provider';
+import LanguageSwitch from './components/language-switch/language-switch';
 
 const LINES = 6;
 const TILES = 5;
@@ -16,7 +14,7 @@ const tilesArray = Array(TILES).fill('');
 const linesArray = Array(LINES).fill(tilesArray);
 
 export const Board = () => {
-  const { changeLanguage } = useLanguage();
+  const { language } = useLanguage();
   const { word, checkWord, reset } = useWord();
 
   const [board, setBoard] = useState(linesArray);
@@ -25,14 +23,13 @@ export const Board = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [open, setOpen] = useState(false);
   const [isReseted, setIsReseted] = useState(true);
-  const [isEng, setIsEng] = useState(false);
 
   const lineRef = useRef<HTMLDivElement>(null);
 
   const handleClick = useCallback(
     async (e: KeyboardEvent) => {
       const key = e.key.toLocaleLowerCase();
-      const regex = isEng ? /^[A-Za-z]$/ : /^[а-яієїґ]$/;
+      const regex = language === 'EN' ? /^[A-Za-z]$/ : /^[а-яієїґ]$/;
 
       if (isGameOver) {
         if (key === 'enter' || key === ' ') {
@@ -51,7 +48,6 @@ export const Board = () => {
 
         return;
       }
-
       if (key === 'enter' && attempt <= 5) {
         if (guess.length === 5) {
           const isWordExists = checkWord(guess);
@@ -99,7 +95,7 @@ export const Board = () => {
         setBoard(newBoard);
       }
     },
-    [isGameOver, board, attempt, guess, isEng, word],
+    [isGameOver, board, attempt, guess, language, word],
   );
 
   const handleReset = () => {
@@ -112,10 +108,6 @@ export const Board = () => {
     reset();
   };
 
-  const handleChangeLanguage = () => {
-    setIsEng(prev => !prev)
-    changeLanguage(!isEng ? 'EN' : 'UA');
-  }
 
   useEffect(() => {
     document.addEventListener('keydown', handleClick);
@@ -123,7 +115,7 @@ export const Board = () => {
     return () => document.removeEventListener('keydown', handleClick);
   }, [handleClick]);
 
-  useEffect(handleReset, [isEng]);
+  useEffect(handleReset, [language]);
 
   return (
     <>
@@ -134,31 +126,11 @@ export const Board = () => {
           recycle={false}
         />
       )}
-
-      <Modal
-        open={open}
-        board={board}
-        setOpen={setOpen}
-        correctWord={word}
-        handleReset={handleReset}
-        isEng={isEng}
-      />
-
       <div className={boardStyles.board}>
-        <div className={boardStyles.head}>
-          <h1 className={boardStyles.title}>{isEng ? 'Wordle' : 'Вордл'}</h1>
-          <Stack direction="row" sx={{ alignItems: 'center' }}>
-            <MaterialUISwitch
-              value={isEng}
-              onChange={handleChangeLanguage}
-              inputProps={{ 'aria-label': 'ant design' }}
-            />
-          </Stack>
-        </div>
+        <LanguageSwitch />
         <div className={boardStyles.wrapper}>
           {board.map((line, i) => (
             <Line
-              isReseted={isReseted}
               isGameOver={isGameOver}
               ref={lineRef}
               index={i}
